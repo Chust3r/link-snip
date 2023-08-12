@@ -4,10 +4,20 @@ import { Button } from '@/components/ui/button'
 import { HomeIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 
-const Page = async ({ params: { slug } }) => {
+interface PageProps {
+    params: {
+        slug: string
+    }
+}
+
+const Page = async ({ params: { slug } }: PageProps) => {
+
     const { data } = await getUrl(slug)
 
-    if (data?.length !== 0) redirect(data[0].url_base)
+    if (data?.length !== 0) {
+        if (data === null) return
+        redirect(data[0].url_base)
+    }
 
     return (
         <div className="bg-background w-full h-full flex items-center justify-center flex-col gap-4">

@@ -1,10 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from './supabase.types'
 
-const { SUPABASE_URL, SUPABASE_API_KEY } = process.env
+const { NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_SUPABASE_URL } = process.env
 
-const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_API_KEY, {
-	auth: { persistSession: false },
-})
+const supabase = createClient<Database>(
+	NEXT_PUBLIC_SUPABASE_URL,
+	NEXT_PUBLIC_SUPABASE_ANON_KEY,
+	{
+		auth:{
+			persistSession:false
+		}
+	}
+)
 
 export { supabase }

@@ -40,15 +40,18 @@ const FormURL = () => {
 
 	const handleSubmit = async (values:Object) => {
 		setisLoading(true)
-		const { error, short_url } = await generateURL(values)
+		const { error, short_url, message } = await generateURL(values)
 		setisLoading(false)
 
-		const shortenURL = `${process.env.NEXT_PUBLIC_BASE_URL}${short_url}`
+		const shortenURL = `${location.origin}/${short_url}`
 
 		if (error)
 			return toast({
-				title: 'something went wrong',
-				variant: 'destructive',
+				title: 'Something went wrong',
+				description: message,
+				action: <ToastAction altText='Try again' onClick={() => handleSubmit(values)}>
+					Try again
+				</ToastAction>
 			})
 		else {
 			form.reset()
@@ -74,6 +77,7 @@ const FormURL = () => {
 				onSubmit={form.handleSubmit(handleSubmit)}
 				className="flex flex-col md:flex-row gap-3"
 				autoComplete="off"
+				method='POST'
 			>
 				<FormField
 					control={form.control}

@@ -15,20 +15,30 @@ export interface Database {
           id: number
           short_url: string
           url_base: string
+          user: string | null
         }
         Insert: {
           created_at?: string
           id?: number
           short_url: string
           url_base: string
+          user?: string | null
         }
         Update: {
           created_at?: string
           id?: number
           short_url?: string
           url_base?: string
+          user?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "url_user_fkey"
+            columns: ["user"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {

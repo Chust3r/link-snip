@@ -10,14 +10,20 @@ import {
 	FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { ToastAction } from '@/components/ui/toast'
-import { useToast } from '@/components/ui/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CopyIcon, Link2Icon, ReloadIcon } from '@radix-ui/react-icons'
+import { Link2Icon, ReloadIcon, CopyIcon } from '@radix-ui/react-icons'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { generateURL } from '@/lib/generate-url'
+import generateURL from '@/lib/generate-url'
+import { useToast } from '@/components/ui/use-toast'
+import { ToastAction } from '@radix-ui/react-toast'
 import { clipboard } from '@/lib/clipboard'
+
+
+
+interface FormSchema {
+	url: string
+}
 
 const formSchema = z.object({
 	url: z.string().trim().url({
@@ -34,40 +40,25 @@ const FormURL = () => {
 		resolver: zodResolver(formSchema),
 		defaultValues,
 	})
+
 	const { toast } = useToast()
 
 	const [isLoading, setisLoading] = useState(false)
 
-	const handleSubmit = async (values:Object) => {
+	const handleSubmit = async (values: FormSchema) => {
 		setisLoading(true)
-		const { error, short_url, message } = await generateURL(values)
+		const { data } = await generateURL(values.url)
 		setisLoading(false)
+		if (data) {
+			const url = `${location.host}/${data.url_short}`
 
-		const shortenURL = `${location.origin}/${short_url}`
-
-		if (error)
-			return toast({
-				title: 'Something went wrong',
-				description: message,
-				action: <ToastAction altText='Try again' onClick={() => handleSubmit(values)}>
-					Try again
-				</ToastAction>
-			})
-		else {
-			form.reset()
 			toast({
-				title: 'Success in shortening',
-				description: shortenURL,
-				action: (
-					<ToastAction
-						altText="copy"
-						onClick={async () => await clipboard(shortenURL)}
-						className="gap-2"
-					>
-						<CopyIcon /> Copy
-					</ToastAction>
-				),
+				title: "Success in shortening",
+				description: url,
+				action: <ToastAction altText='copy' onClick={() => clipboard(url)}><CopyIcon /></ToastAction>
 			})
+
+			form.reset()
 		}
 	}
 
@@ -77,14 +68,13 @@ const FormURL = () => {
 				onSubmit={form.handleSubmit(handleSubmit)}
 				className="flex flex-col md:flex-row gap-3"
 				autoComplete="off"
-				method='POST'
 			>
 				<FormField
 					control={form.control}
 					name="url"
 					render={({ field }) => (
-						<FormItem className="w-full text-muted-foreground">
-							<FormControl>
+						<FormItem className="w-full text-muted-foreground ">
+							<FormControl className='bg-background/40 backdrop-blur'>
 								<Input placeholder="Your URL" {...field} />
 							</FormControl>
 							<FormMessage className="text-muted-foreground" />

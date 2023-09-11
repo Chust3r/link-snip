@@ -1,30 +1,20 @@
-const generateURL = async (values: Object) => {
-	const res = await fetch(`${location.origin}/api`, {
+const generateURL = async (url: string) => {
+	const body = {
+		url_base: url,
+		url_short: Math.random().toString(36).substring(2, 7),
+	}
+
+	const res = await fetch('http://localhost:3000/api/url', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify(values),
+		body: JSON.stringify(body),
 	})
 
-	const {
-		short_url,
-		status,
-		statusText,
+	const data = await res.json()
 
-	} = await res.json()
-
-	if (res.status !== 200 || status === 401)
-		return {
-			error: true,
-			short_url: null,
-			message: `${statusText}`,
-		}
-	return {
-		error: false,
-		short_url,
-		message: null,
-	}
+	return { data }
 }
 
-export { generateURL }
+export default generateURL
